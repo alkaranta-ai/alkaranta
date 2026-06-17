@@ -1,96 +1,95 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Alkaranta Finanzas</title>
-
-<link rel="stylesheet" href="styles.css">
-<link rel="manifest" href="manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alkaranta Finanzas</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
 </head>
-
 <body>
-
 <div class="container">
 
-    <header>
-        <h1>💰 Alkaranta Finanzas</h1>
-        <p>Control inteligente de ingresos y egresos</p>
-    </header>
+  <header>
+    <h1>💰 Alkaranta Finanzas</h1>
+    <p>Control inteligente de ingresos y egresos</p>
+  </header>
 
-    <section class="cards">
+  <section class="cards">
+    <div class="card card-saldo">
+      <h3>Saldo Total</h3>
+      <span id="saldoTotal">$0</span>
+    </div>
+    <div class="card card-ingresos">
+      <h3>Ingresos</h3>
+      <span id="totalIngresos">$0</span>
+    </div>
+    <div class="card card-egresos">
+      <h3>Egresos</h3>
+      <span id="totalEgresos">$0</span>
+    </div>
+  </section>
 
-        <div class="card">
-            <h3>Saldo Total</h3>
-            <span id="saldoTotal">$0</span>
-        </div>
-
-        <div class="card">
-            <h3>Ingresos</h3>
-            <span id="totalIngresos">$0</span>
-        </div>
-
-        <div class="card">
-            <h3>Egresos</h3>
-            <span id="totalEgresos">$0</span>
-        </div>
-
-    </section>
-    <section class="grafico">
+  <section class="grafico">
     <h2>Resumen Financiero</h2>
-    <canvas id="graficoFinanzas"></canvas>
-</section>
+    <div class="grafico-inner">
+      <canvas id="graficoTorta"></canvas>
+      <canvas id="graficoBarras"></canvas>
+    </div>
+  </section>
 
-    <section class="formulario">
+  <section class="formulario">
+    <h2 id="tituloFormulario">Nuevo Movimiento</h2>
+    <input type="date" id="fecha">
+    <select id="tipo" onchange="actualizarCategorias()">
+      <option value="Ingreso">Ingreso</option>
+      <option value="Egreso">Egreso</option>
+    </select>
+    <select id="categoria"></select>
+    <input type="number" id="monto" placeholder="Monto" min="0">
+    <input type="text" id="descripcion" placeholder="Descripción (opcional)">
+    <div class="btn-group">
+      <button id="btnGuardar" onclick="guardarMovimiento()">💾 Guardar Movimiento</button>
+      <button id="btnCancelar" class="btn-cancelar" onclick="cancelarEdicion()" style="display:none">✕ Cancelar</button>
+    </div>
+  </section>
 
-        <h2>Nuevo Movimiento</h2>
-        <input type="date" id="fecha">
-        
-        <select id="tipo" onchange="actualizarCategorias()">
-            <option value="Ingreso">Ingreso</option>
-            <option value="Egreso">Egreso</option>
-        </select>
+  <section class="filtros">
+    <div class="filtros-inner">
+      <select id="filtroMes" onchange="renderizar()">
+        <option value="">Todos los meses</option>
+      </select>
+      <select id="filtroTipo" onchange="renderizar()">
+        <option value="">Todos</option>
+        <option value="Ingreso">Ingresos</option>
+        <option value="Egreso">Egresos</option>
+      </select>
+      <button class="btn-export" onclick="exportarCSV()">📥 Exportar CSV</button>
+    </div>
+  </section>
 
-        <select id="categoria"></select>
-
-        <input type="number" id="monto" placeholder="Monto">
-
-        <input type="text" id="descripcion" placeholder="Descripción">
-
-        <button onclick="guardarMovimiento()">
-            Guardar Movimiento
-        </button>
-
-    </section>
-
-    <section class="tabla">
-
-        <h2>Movimientos</h2>
-
-        <table>
-
-           <thead>
-    <tr>
-        <th>Fecha</th>
-        <th>Tipo</th>
-        <th>Categoría</th>
-        <th>Monto</th>
-        <th>Acciones</th>
-    </tr>
-</thead>
-
-            <tbody id="tablaMovimientos">
-            </tbody>
-
-        </table>
-
-    </section>
+  <section class="tabla">
+    <h2>Movimientos</h2>
+    <div class="tabla-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Categoría</th>
+            <th>Monto</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaMovimientos"></tbody>
+      </table>
+    </div>
+    <p id="sinMovimientos" class="sin-datos" style="display:none">No hay movimientos para mostrar.</p>
+  </section>
 
 </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="app.js"></script>
-
 </body>
 </html>
