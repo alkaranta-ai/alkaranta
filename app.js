@@ -36,6 +36,12 @@ function actualizarCategorias() {
   });
 }
 
+// Función auxiliar para saber si un movimiento pertenece al modo actual
+function perteneceAlModo(m) {
+  const entidad = m.entidad || 'personal';
+  return entidad === modoActual;
+}
+
 function guardarMovimiento() {
   const fecha       = document.getElementById("fecha").value;
   const tipo        = document.getElementById("tipo").value;
@@ -109,7 +115,8 @@ function poblarFiltroMeses() {
   const sel = document.getElementById("filtroMes");
   const actual = sel.value;
   const meses = new Set();
-  movimientos.forEach(m => {
+  // Solo consideramos los meses de los movimientos que pertenecen al modo actual
+  movimientos.filter(perteneceAlModo).forEach(m => {
     if (m.fecha && m.fecha.length >= 7) meses.add(m.fecha.slice(0, 7));
   });
   sel.innerHTML = '<option value="">Todos los meses</option>';
@@ -129,10 +136,9 @@ function renderizar() {
   const filtroTipo = document.getElementById("filtroTipo").value;
 
   const filtrados = movimientos.filter(m => {
-    const esEntidadCorrecta = !m.entidad || m.entidad === modoActual;
-    const okMes  = !filtroMes  || (m.fecha && m.fecha.startsWith(filtroMes));
-    const okTipo = !filtroTipo || m.tipo === filtroTipo;
-    return esEntidadCorrecta && okMes && okTipo;
+    return perteneceAlModo(m) && 
+           (!filtroMes || (m.fecha && m.fecha.startsWith(filtroMes))) && 
+           (!filtroTipo || m.tipo === filtroTipo);
   });
 
   const tabla = document.getElementById("tablaMovimientos");
@@ -166,7 +172,7 @@ function renderizar() {
         <td style="color:#888;font-size:0.85rem">${mov.descripcion || "—"}</td>
         <td>
           <button class="btn-accion" onclick="editarMovimiento(${idxReal})" title="Editar">✏️</button>
-          <button class="btn-accion" onclick="eliminarMovimiento(${idxReal})" title="Eliminar">🗑️</button>
+          <button class="btn-accion" onclick="eliminarMovimiento(${idxReal})" title="🗑️">🗑️</button>
         </td>
       `;
       tabla.appendChild(fila);
@@ -198,7 +204,7 @@ function actualizarGraficos(ingresos, egresos) {
     const label = d.toLocaleDateString("es-AR", { month: "short", year: "2-digit" });
     meses.push(label);
     let ing = 0, egr = 0;
-    movimientos.filter(m => !m.entidad || m.entidad === modoActual).forEach(m => {
+    movimientos.filter(perteneceAlModo).forEach(m => {
       if (m.fecha && m.fecha.startsWith(clave)) {
         if (m.tipo === "Ingreso") ing += m.monto;
         else egr += m.monto;
@@ -224,7 +230,7 @@ function actualizarGraficos(ingresos, egresos) {
 function exportarCSV() {
   if (movimientos.length === 0) { alert("No hay movimientos para exportar."); return; }
   const encabezado = ["Fecha","Tipo","Categoría","Monto","Descripción", "Entidad"];
-  const filas = movimientos.map(m => [m.fecha, m.tipo, m.categoria, m.monto, m.descripcion || "", m.entidad || "Personal"]);
+  const filas = movimientos.map(m => [m.fecha, m.tipo, m.categoria, m.monto, m.descripcion || "", m.entidad || "personal"]);
   const csv = [encabezado, ...filas].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
   const url  = URL.createObjectURL(blob);
