@@ -5,7 +5,7 @@
   "scope": "/Alkaranta-Finanzas/",
   "display": "standalone",
   "background_color": "#052e16",
-  "theme_color": "#22c55e",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "icono-192.png",
