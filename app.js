@@ -195,7 +195,7 @@ function actualizarGraficos(ingresos, egresos) {
 
   const hoy = new Date();
   const meses = [], datosIng = [], datosEgr = [];
-  for (let i = 5; i >= 0; i--) {
+  for (let i = 11; i >= 0; i--) {
     const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
     const clave = d.toISOString().slice(0, 7);
     const label = d.toLocaleDateString("es-AR", { month: "short", year: "2-digit" });
