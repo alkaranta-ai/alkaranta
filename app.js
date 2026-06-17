@@ -4,6 +4,15 @@ const categorias = {
 };
 
 let movimientos = JSON.parse(localStorage.getItem("movimientos")) || [];
+let modoActual = 'personal'; // Por defecto empieza en personal
+
+function cambiarModo(modo) {
+  modoActual = modo;
+  // Cambiar colores de botones para que se vea qué está activo
+  document.getElementById('btnPersonal').style.backgroundColor = modo === 'personal' ? '#3498db' : '#bdc3c7';
+  document.getElementById('btnLaboral').style.backgroundColor = modo === 'laboral' ? '#3498db' : '#bdc3c7';
+  renderizar(); // Volver a dibujar todo al cambiar de pestaña
+}
 let editandoIndice = null;
 let graficoTorta  = null;
 let graficoBarras = null;
