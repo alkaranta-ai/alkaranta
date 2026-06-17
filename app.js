@@ -4,15 +4,15 @@ const categorias = {
 };
 
 let movimientos = JSON.parse(localStorage.getItem("movimientos")) || [];
-let modoActual = 'personal'; // Por defecto empieza en personal
+let modoActual = 'personal';
 
 function cambiarModo(modo) {
   modoActual = modo;
-  // Cambiar colores de botones para que se vea qué está activo
   document.getElementById('btnPersonal').style.backgroundColor = modo === 'personal' ? '#3498db' : '#bdc3c7';
   document.getElementById('btnLaboral').style.backgroundColor = modo === 'laboral' ? '#3498db' : '#bdc3c7';
-  renderizar(); // Volver a dibujar todo al cambiar de pestaña
+  renderizar();
 }
+
 let editandoIndice = null;
 let graficoTorta  = null;
 let graficoBarras = null;
@@ -46,7 +46,7 @@ function guardarMovimiento() {
   if (!monto || monto <= 0) { alert("Ingresá un monto válido."); return; }
   if (!fecha)               { alert("Seleccioná una fecha."); return; }
 
-  const mov = { fecha, tipo, categoria, monto, descripcion };
+  const mov = { fecha, tipo, categoria, monto, descripcion, entidad: modoActual };
 
   if (editandoIndice !== null) {
     movimientos[editandoIndice] = mov;
@@ -129,16 +129,17 @@ function renderizar() {
   const filtroTipo = document.getElementById("filtroTipo").value;
 
   const filtrados = movimientos.filter(m => {
+    const esEntidadCorrecta = !m.entidad || m.entidad === modoActual;
     const okMes  = !filtroMes  || (m.fecha && m.fecha.startsWith(filtroMes));
     const okTipo = !filtroTipo || m.tipo === filtroTipo;
-    return okMes && okTipo;
+    return esEntidadCorrecta && okMes && okTipo;
   });
 
   const tabla = document.getElementById("tablaMovimientos");
   tabla.innerHTML = "";
 
   let ingresos = 0, egresos = 0;
-  movimientos.forEach(m => {
+  filtrados.forEach(m => {
     if (m.tipo === "Ingreso") ingresos += m.monto;
     else                      egresos  += m.monto;
   });
@@ -146,7 +147,8 @@ function renderizar() {
   document.getElementById("totalIngresos").textContent = "$" + ingresos.toLocaleString("es-AR");
   document.getElementById("totalEgresos").textContent  = "$" + egresos.toLocaleString("es-AR");
   document.getElementById("saldoTotal").textContent    = "$" + (ingresos - egresos).toLocaleString("es-AR");
-document.getElementById("saldoTotal").style.color = (ingresos - egresos) < 0 ? "#e74c3c" : "#27ae60";
+  document.getElementById("saldoTotal").style.color = (ingresos - egresos) < 0 ? "#e74c3c" : "#27ae60";
+
   const sinMov = document.getElementById("sinMovimientos");
   if (filtrados.length === 0) {
     sinMov.style.display = "block";
@@ -154,9 +156,7 @@ document.getElementById("saldoTotal").style.color = (ingresos - egresos) < 0 ? "
     sinMov.style.display = "none";
     filtrados.forEach(mov => {
       const idxReal = movimientos.indexOf(mov);
-      const fecha = mov.fecha
-        ? new Date(mov.fecha + "T00:00:00").toLocaleDateString("es-AR")
-        : "";
+      const fecha = mov.fecha ? new Date(mov.fecha + "T00:00:00").toLocaleDateString("es-AR") : "";
       const fila = document.createElement("tr");
       fila.innerHTML = `
         <td>${fecha}</td>
@@ -172,7 +172,6 @@ document.getElementById("saldoTotal").style.color = (ingresos - egresos) < 0 ? "
       tabla.appendChild(fila);
     });
   }
-
   actualizarGraficos(ingresos, egresos);
 }
 
@@ -183,20 +182,9 @@ function actualizarGraficos(ingresos, egresos) {
     type: "doughnut",
     data: {
       labels: ["Ingresos", "Egresos"],
-      datasets: [{
-        data: [ingresos, egresos],
-        backgroundColor: ["#2196f3", "#e74c3c"],
-        borderWidth: 0,
-        hoverOffset: 6
-      }]
+      datasets: [{ data: [ingresos, egresos], backgroundColor: ["#2196f3", "#e74c3c"], borderWidth: 0, hoverOffset: 6 }]
     },
-    options: {
-      cutout: "65%",
-      plugins: {
-        legend: { position: "bottom", labels: { font: { size: 12 }, padding: 12 } }
-      },
-      animation: { duration: 500 }
-    }
+    options: { cutout: "65%", plugins: { legend: { position: "bottom" } }, animation: { duration: 500 } }
   });
 
   const ctxBarras = document.getElementById("graficoBarras").getContext("2d");
@@ -210,10 +198,10 @@ function actualizarGraficos(ingresos, egresos) {
     const label = d.toLocaleDateString("es-AR", { month: "short", year: "2-digit" });
     meses.push(label);
     let ing = 0, egr = 0;
-    movimientos.forEach(m => {
+    movimientos.filter(m => !m.entidad || m.entidad === modoActual).forEach(m => {
       if (m.fecha && m.fecha.startsWith(clave)) {
         if (m.tipo === "Ingreso") ing += m.monto;
-        else                      egr += m.monto;
+        else egr += m.monto;
       }
     });
     datosIng.push(ing);
@@ -226,43 +214,4 @@ function actualizarGraficos(ingresos, egresos) {
       labels: meses,
       datasets: [
         { label: "Ingresos", data: datosIng, backgroundColor: "#2196f3", borderRadius: 6 },
-        { label: "Egresos",  data: datosEgr, backgroundColor: "#e74c3c", borderRadius: 6 }
-      ]
-    },
-    options: {
-      plugins: {
-        legend: { position: "bottom", labels: { font: { size: 12 }, padding: 12 } }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { callback: v => "$" + v.toLocaleString("es-AR"), font: { size: 11 } },
-          grid: { color: "#f0f2f5" }
-        },
-        x: { grid: { display: false } }
-      },
-      animation: { duration: 500 }
-    }
-  });
-}
-
-function exportarCSV() {
-  if (movimientos.length === 0) { alert("No hay movimientos para exportar."); return; }
-  const encabezado = ["Fecha","Tipo","Categoría","Monto","Descripción"];
-  const filas = movimientos.map(m => [m.fecha, m.tipo, m.categoria, m.monto, m.descripcion || ""]);
-  const csv = [encabezado, ...filas]
-    .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(","))
-    .join("\n");
-  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement("a");
-  a.href = url;
-  a.download = `alkaranta-finanzas-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-URL.revokeObjectURL(url);
-}
-
-function resetearFecha() {
-  document.getElementById("fecha").value = new Date().toISOString().split("T")[0];
-}
+        { label: "Egresos",
