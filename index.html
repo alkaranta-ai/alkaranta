@@ -12,427 +12,503 @@
   <meta name="apple-mobile-web-app-title" content="Alkaranta">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:         #F0F4F8;
-      --bg-card:    #FFFFFF;
-      --bg-mid:     #F8FAFC;
-      --bg-line:    #E2E8F0;
-      --accent:     #3B82F6;
-      --accent-dim: #1D4ED8;
-      --green:      #10B981;
-      --red:        #EF4444;
-      --amber:      #F59E0B;
-      --text-1:     #0F1C2E;
-      --text-2:     #475569;
-      --text-3:     #94A3B8;
-      --shadow:     0 2px 12px rgba(0,0,0,0.08);
-      --radius-sm:  8px;
-      --radius-md:  14px;
-      --radius-lg:  20px;
+      --emerald:      #059669;
+      --emerald-light:#34D399;
+      --emerald-dim:  #047857;
+      --red:          #F43F5E;
+      --amber:        #F59E0B;
+
+      --bg:           #F5F5F7;
+      --surface:      #FFFFFF;
+      --surface-2:    #F5F5F7;
+      --border:       rgba(0,0,0,0.08);
+      --border-strong:rgba(0,0,0,0.14);
+      --text-1:       #1D1D1F;
+      --text-2:       #6E6E73;
+      --text-3:       #AEAEB2;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:    0 4px 16px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+      --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg:         #0F1C2E;
-        --bg-card:    #1C2D42;
-        --bg-mid:     #162236;
-        --bg-line:    #243348;
-        --text-1:     #F0F4F8;
-        --text-2:     #94A3B8;
-        --text-3:     #64748B;
-        --shadow:     0 4px 24px rgba(0,0,0,0.35);
+        --bg:           #000000;
+        --surface:      #1C1C1E;
+        --surface-2:    #2C2C2E;
+        --border:       rgba(255,255,255,0.08);
+        --border-strong:rgba(255,255,255,0.14);
+        --text-1:       #F5F5F7;
+        --text-2:       #98989D;
+        --text-3:       #636366;
+        --shadow-sm:    0 1px 3px rgba(0,0,0,0.4);
+        --shadow-md:    0 4px 20px rgba(0,0,0,0.5);
       }
     }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text-1);
       min-height: 100vh;
-      padding-bottom: 100px;
-      transition: background .3s, color .3s;
+      padding-bottom: 90px;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── HEADER ── */
+    /* ── TOP BAR ── */
     .top-bar {
       position: sticky; top: 0; z-index: 100;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--bg-line);
-      padding: 14px 20px;
+      background: rgba(var(--surface-rgb, 255,255,255), 0.85);
+      background: var(--surface);
+      border-bottom: 0.5px solid var(--border);
+      padding: 0 20px;
+      height: 56px;
       display: flex; align-items: center; justify-content: space-between;
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
     }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: var(--accent); display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
+    .brand-name {
+      font-size: 17px; font-weight: 600; letter-spacing: -0.3px; color: var(--text-1);
     }
-    .brand-name { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1.15rem; letter-spacing: -0.3px; color: var(--text-1); }
-    .brand-name span { color: var(--accent); }
+    .brand-name em { font-style: normal; color: var(--emerald); }
 
-    /* ── MODO TABS ── */
-    .mode-tabs { display: flex; gap: 4px; background: var(--bg-mid); border-radius: var(--radius-sm); padding: 4px; border: 1px solid var(--bg-line); }
-    .mode-tab {
-      padding: 6px 16px; border-radius: 6px; border: none; cursor: pointer;
-      font-size: 0.8rem; font-weight: 600; font-family: 'Inter', sans-serif;
-      transition: all .2s; color: var(--text-2); background: transparent;
+    .mode-pill {
+      display: flex; gap: 2px;
+      background: var(--surface-2);
+      border-radius: 999px; padding: 3px;
+      border: 0.5px solid var(--border);
     }
-    .mode-tab.active { background: var(--accent); color: #fff; }
-
-    /* ── LAYOUT ── */
-    .page { max-width: 680px; margin: 0 auto; padding: 24px 16px; }
-
-    /* ── CARDS RESUMEN ── */
-    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-    .summary-card {
-      background: var(--bg-card); border: 1px solid var(--bg-line);
-      border-radius: var(--radius-md); padding: 18px 16px;
-      position: relative; overflow: hidden; box-shadow: var(--shadow);
+    .mode-btn {
+      padding: 5px 14px; border-radius: 999px; border: none; cursor: pointer;
+      font-size: 13px; font-weight: 500; font-family: inherit;
+      transition: all .2s cubic-bezier(.4,0,.2,1);
+      color: var(--text-2); background: transparent;
     }
-    .summary-card.main {
-      grid-column: 1 / -1;
-      background: linear-gradient(135deg, var(--accent-dim), var(--accent));
-      border-color: transparent;
-    }
-    .summary-card .label {
-      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--text-3); margin-bottom: 8px;
-    }
-    .summary-card.main .label { color: rgba(255,255,255,0.75); }
-    .summary-card .amount { font-family: 'DM Sans', sans-serif; font-size: 2rem; font-weight: 700; line-height: 1; color: var(--text-1); }
-    .summary-card .amount.negative { color: var(--red); }
-    .summary-card.main .amount { font-size: 2.4rem; color: #fff; }
-    .summary-card .sub-label { font-size: 0.78rem; color: var(--text-2); margin-top: 4px; }
-    .summary-card.main .sub-label { color: rgba(255,255,255,0.7); }
-    .card-ing .amount { color: var(--green); }
-    .card-egr .amount { color: var(--red); }
-    .card-accent-line { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
-    .card-ing .card-accent-line { background: var(--green); }
-    .card-egr .card-accent-line { background: var(--red); }
-
-    /* ── SECCIÓN ── */
-    .section-title {
-      font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 700;
-      color: var(--text-3); letter-spacing: 0.06em; text-transform: uppercase;
-      margin-bottom: 14px; margin-top: 28px;
+    .mode-btn.active {
+      background: var(--surface); color: var(--text-1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
     }
 
-    /* ── FORMULARIO ── */
+    /* ── PAGE ── */
+    .page { max-width: 640px; margin: 0 auto; padding: 0 16px; }
+
+    /* ── HERO CARD ── */
+    .hero {
+      margin: 20px 0 12px;
+      background: var(--emerald-dim);
+      border-radius: var(--r-xl);
+      padding: 28px 24px 24px;
+      position: relative; overflow: hidden;
+      color: #fff;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -40px; right: -40px;
+      width: 180px; height: 180px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -60px; right: 30px;
+      width: 140px; height: 140px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .hero-label { font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7; margin-bottom: 6px; }
+    .hero-amount { font-size: 42px; font-weight: 300; letter-spacing: -1.5px; line-height: 1; margin-bottom: 4px; }
+    .hero-amount.negative { color: #FDA4AF; }
+    .hero-period { font-size: 13px; opacity: 0.6; margin-bottom: 20px; }
+    .hero-row { display: flex; gap: 0; }
+    .hero-stat { flex: 1; }
+    .hero-stat + .hero-stat { border-left: 0.5px solid rgba(255,255,255,0.2); padding-left: 20px; margin-left: 20px; }
+    .hero-stat-label { font-size: 11px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px; }
+    .hero-stat-val { font-size: 20px; font-weight: 500; letter-spacing: -0.5px; }
+
+    /* ── MINI CARDS ── */
+    .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+    .mini-card {
+      background: var(--surface); border-radius: var(--r-md);
+      padding: 16px; border: 0.5px solid var(--border); box-shadow: var(--shadow-sm);
+    }
+    .mini-label { font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px; }
+    .mini-val { font-size: 22px; font-weight: 500; letter-spacing: -0.5px; }
+    .mini-val.ing { color: var(--emerald); }
+    .mini-val.egr { color: var(--red); }
+    .mini-bar { height: 3px; border-radius: 999px; margin-top: 10px; }
+    .mini-bar.ing { background: var(--emerald); }
+    .mini-bar.egr { background: var(--red); }
+
+    /* ── SECTION LABEL ── */
+    .sec-label {
+      font-size: 13px; font-weight: 600; letter-spacing: -0.1px;
+      color: var(--text-2); margin: 24px 0 10px;
+      text-transform: uppercase; font-size: 11px; letter-spacing: 0.06em;
+    }
+
+    /* ── GROUPED LIST (Apple settings style) ── */
+    .list-group {
+      background: var(--surface); border-radius: var(--r-lg);
+      border: 0.5px solid var(--border); overflow: hidden;
+      box-shadow: var(--shadow-sm); margin-bottom: 12px;
+    }
+    .list-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 16px; border-bottom: 0.5px solid var(--border); gap: 12px;
+    }
+    .list-row:last-child { border-bottom: none; }
+    .list-row-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .list-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+    .list-icon.ing { background: rgba(5,150,105,0.12); }
+    .list-icon.egr { background: rgba(244,63,94,0.12); }
+    .list-title { font-size: 15px; font-weight: 400; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .list-sub { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+    .list-right { text-align: right; flex-shrink: 0; }
+    .list-amount { font-size: 15px; font-weight: 500; letter-spacing: -0.3px; }
+    .list-amount.ing { color: var(--emerald); }
+    .list-amount.egr { color: var(--red); }
+    .list-date { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+    .list-actions { display: flex; gap: 6px; }
+    .btn-row-action {
+      background: var(--surface-2); border: 0.5px solid var(--border);
+      border-radius: 8px; padding: 5px 9px; font-size: 12px;
+      cursor: pointer; color: var(--text-2); transition: all .15s;
+    }
+    .btn-row-action:hover { color: var(--emerald); border-color: var(--emerald); }
+
+    /* ── FORM ── */
     .form-card {
-      background: var(--bg-card); border: 1px solid var(--bg-line);
-      border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px; box-shadow: var(--shadow);
+      background: var(--surface); border-radius: var(--r-lg);
+      border: 0.5px solid var(--border); box-shadow: var(--shadow-sm);
+      overflow: hidden; margin-bottom: 12px;
     }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .form-group { margin-bottom: 12px; }
-    .form-group label {
-      display: block; font-size: 0.72rem; font-weight: 600;
-      color: var(--text-3); margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase;
+    .form-section { padding: 16px; border-bottom: 0.5px solid var(--border); }
+    .form-section:last-child { border-bottom: none; }
+    .form-section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+    .field input, .field select {
+      width: 100%; padding: 10px 12px;
+      background: var(--surface-2); color: var(--text-1);
+      border: 0.5px solid var(--border-strong); border-radius: var(--r-sm);
+      font-size: 15px; font-family: inherit; font-weight: 400;
+      transition: border-color .15s, box-shadow .15s; appearance: none;
+      -webkit-appearance: none;
     }
-    .form-group input, .form-group select {
-      width: 100%; padding: 11px 14px;
-      background: var(--bg-mid); color: var(--text-1);
-      border: 1px solid var(--bg-line); border-radius: var(--radius-sm);
-      font-size: 0.9rem; font-family: 'Inter', sans-serif; transition: border-color .2s; appearance: none;
+    .field input:focus, .field select:focus {
+      outline: none; border-color: var(--emerald);
+      box-shadow: 0 0 0 3px rgba(5,150,105,0.15);
     }
-    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
-    .form-group input::placeholder { color: var(--text-3); }
-    .btn-row { display: flex; gap: 10px; margin-top: 4px; }
-    .btn {
-      flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm);
-      font-size: 0.9rem; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s;
+    .field input::placeholder { color: var(--text-3); }
+    .btn-primary {
+      width: 100%; padding: 14px; background: var(--emerald);
+      color: #fff; border: none; border-radius: var(--r-md);
+      font-size: 15px; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all .15s; letter-spacing: -0.2px;
     }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent-dim); }
-    .btn-cancel { background: var(--bg-line); color: var(--text-2); display: none; }
-    .btn-cancel:hover { color: var(--text-1); }
-    .date-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 12px; }
-    .date-row .form-group { flex: 1; margin-bottom: 0; }
+    .btn-primary:hover { background: var(--emerald-dim); }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-secondary {
+      width: 100%; padding: 14px; background: var(--surface-2);
+      color: var(--text-2); border: 0.5px solid var(--border-strong);
+      border-radius: var(--r-md); font-size: 15px; font-weight: 500;
+      font-family: inherit; cursor: pointer; transition: all .15s; display: none;
+    }
     .btn-today {
-      padding: 11px 14px; background: var(--bg-mid); color: var(--text-2);
-      border: 1px solid var(--bg-line); border-radius: var(--radius-sm);
-      font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap;
-      font-family: 'Inter', sans-serif; transition: all .15s;
+      padding: 10px 14px; background: var(--surface-2); color: var(--text-2);
+      border: 0.5px solid var(--border-strong); border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit;
+      white-space: nowrap; transition: all .15s;
     }
-    .btn-today:hover { color: var(--text-1); border-color: var(--accent); }
+    .btn-today:hover { color: var(--emerald); border-color: var(--emerald); }
+    .btn-ghost {
+      padding: 9px 14px; background: transparent;
+      border: 0.5px solid var(--border-strong); border-radius: var(--r-sm);
+      color: var(--text-2); font-size: 13px; font-weight: 500; font-family: inherit;
+      cursor: pointer; transition: all .15s; white-space: nowrap;
+    }
+    .btn-ghost:hover { color: var(--emerald); border-color: var(--emerald); }
 
     /* ── FILTROS ── */
-    .filters-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-    .filters-row select {
-      flex: 1; min-width: 130px; padding: 9px 12px;
-      background: var(--bg-card); color: var(--text-1);
-      border: 1px solid var(--bg-line); border-radius: var(--radius-sm);
-      font-size: 0.85rem; font-family: 'Inter', sans-serif; appearance: none;
+    .filter-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filter-row select {
+      flex: 1; min-width: 120px; padding: 9px 12px;
+      background: var(--surface); color: var(--text-1);
+      border: 0.5px solid var(--border-strong); border-radius: var(--r-sm);
+      font-size: 13px; font-family: inherit; appearance: none; -webkit-appearance: none;
     }
-    .btn-export {
-      padding: 9px 16px; background: transparent; border: 1px solid var(--bg-line);
-      border-radius: var(--radius-sm); color: var(--text-2); font-size: 0.85rem; font-weight: 600;
-      font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s; white-space: nowrap;
-    }
-    .btn-export:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* ── TABLA ── */
-    .tabla-wrap { background: var(--bg-card); border: 1px solid var(--bg-line); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 24px; box-shadow: var(--shadow); }
-    .tabla-scroll { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    thead tr { background: var(--bg-mid); }
-    thead th { padding: 12px 14px; text-align: left; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
-    tbody tr { border-top: 1px solid var(--bg-line); transition: background .1s; }
-    tbody tr:hover { background: rgba(59,130,246,0.05); }
-    tbody td { padding: 12px 14px; color: var(--text-1); }
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; }
-    .badge-ingreso { background: rgba(16,185,129,0.15); color: var(--green); }
-    .badge-egreso  { background: rgba(239,68,68,0.15);  color: var(--red); }
-    .monto-ingreso { color: var(--green); font-weight: 600; font-family: 'DM Sans', sans-serif; }
-    .monto-egreso  { color: var(--red);   font-weight: 600; font-family: 'DM Sans', sans-serif; }
-    .btn-accion {
-      background: transparent; border: 1px solid var(--bg-line); color: var(--text-3);
-      border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.8rem;
-      transition: all .15s; margin-right: 4px;
+    /* ── CHARTS ── */
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .chart-card {
+      background: var(--surface); border-radius: var(--r-lg);
+      border: 0.5px solid var(--border); padding: 16px;
+      box-shadow: var(--shadow-sm);
     }
-    .btn-accion:hover { border-color: var(--accent); color: var(--accent); }
-    .sin-datos { text-align: center; color: var(--text-3); padding: 32px; font-size: 0.9rem; }
-
-    /* ── GRÁFICOS ── */
-    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
-    .chart-card { background: var(--bg-card); border: 1px solid var(--bg-line); border-radius: var(--radius-md); padding: 16px; box-shadow: var(--shadow); }
     .chart-card.wide { grid-column: 1 / -1; }
-    .chart-card h3 { font-size: 0.72rem; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
-    .chart-card canvas { max-height: 200px; }
-    .chart-card.wide canvas { max-height: 180px; }
+    .chart-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; }
+    .chart-card canvas { max-height: 190px; }
+    .chart-card.wide canvas { max-height: 160px; }
 
-    /* ── CATEGORÍAS ── */
-    .cat-card { background: var(--bg-card); border: 1px solid var(--bg-line); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 24px; box-shadow: var(--shadow); }
-    .cat-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-top: 1px solid var(--bg-line); font-size: 0.88rem; }
-    .cat-row:first-child { border-top: none; }
-    .cat-name { color: var(--text-2); }
-    .cat-amount { font-family: 'DM Sans', sans-serif; font-weight: 700; color: var(--text-1); }
+    /* ── PROGRESS ── */
+    .prog-bar { height: 4px; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin: 8px 0 0; }
+    .prog-fill { height: 100%; border-radius: 999px; transition: width .5s cubic-bezier(.4,0,.2,1); }
+    .ok   { background: var(--emerald); }
+    .warn { background: var(--amber); }
+    .over { background: var(--red); }
 
-    /* ── PRESUPUESTO ── */
-    .budget-card { background: var(--bg-card); border: 1px solid var(--bg-line); border-radius: var(--radius-lg); margin-bottom: 16px; overflow: hidden; box-shadow: var(--shadow); }
-    .budget-item { padding: 14px 16px; border-top: 1px solid var(--bg-line); }
-    .budget-item:first-child { border-top: none; }
-    .budget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .budget-label { font-size: 0.88rem; color: var(--text-1); font-weight: 500; }
-    .budget-amounts { font-size: 0.78rem; color: var(--text-3); }
-    .budget-amounts span { color: var(--text-2); font-weight: 600; }
-    .progress-bar { height: 6px; background: var(--bg-line); border-radius: 999px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 999px; transition: width .4s ease; }
-    .progress-ok   { background: var(--green); }
-    .progress-warn { background: var(--amber); }
-    .progress-over { background: var(--red); }
-    .btn-add-budget {
-      width: 100%; padding: 12px; background: transparent;
-      border: 1px dashed var(--bg-line); border-radius: var(--radius-sm);
-      color: var(--text-3); font-size: 0.85rem; font-family: 'Inter', sans-serif;
-      cursor: pointer; transition: all .15s;
-    }
-    .btn-add-budget:hover { border-color: var(--accent); color: var(--accent); }
+    /* ── PRESUPUESTO ROWS ── */
+    .budget-row { padding: 14px 16px; border-bottom: 0.5px solid var(--border); }
+    .budget-row:last-child { border-bottom: none; }
+    .budget-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .budget-name { font-size: 15px; color: var(--text-1); }
+    .budget-nums { font-size: 13px; color: var(--text-3); }
+    .budget-nums b { color: var(--text-2); font-weight: 500; }
 
     /* ── METAS ── */
-    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-    .meta-card { background: var(--bg-card); border: 1px solid var(--bg-line); border-radius: var(--radius-md); padding: 16px; position: relative; box-shadow: var(--shadow); }
-    .meta-icon { font-size: 1.4rem; margin-bottom: 8px; }
-    .meta-name { font-size: 0.88rem; font-weight: 600; color: var(--text-1); margin-bottom: 4px; }
-    .meta-amounts { font-size: 0.75rem; color: var(--text-3); margin-bottom: 10px; }
-    .meta-amounts span { color: var(--accent); font-weight: 600; }
-    .meta-pct { font-family: 'DM Sans', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-top: 6px; }
-    .meta-actions { display: flex; gap: 6px; margin-top: 10px; }
-    .btn-meta-add {
-      flex: 1; padding: 7px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3);
-      border-radius: var(--radius-sm); color: var(--accent); font-size: 0.75rem; font-weight: 600;
-      font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s;
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .meta-card {
+      background: var(--surface); border-radius: var(--r-lg);
+      border: 0.5px solid var(--border); padding: 18px 16px;
+      box-shadow: var(--shadow-sm); position: relative;
     }
-    .btn-meta-add:hover { background: rgba(59,130,246,0.2); }
+    .meta-emoji { font-size: 26px; margin-bottom: 10px; display: block; }
+    .meta-name { font-size: 15px; font-weight: 500; color: var(--text-1); margin-bottom: 2px; }
+    .meta-sub { font-size: 12px; color: var(--text-3); margin-bottom: 10px; }
+    .meta-sub b { color: var(--emerald); font-weight: 600; }
+    .meta-pct { font-size: 24px; font-weight: 300; letter-spacing: -0.5px; color: var(--emerald); margin-top: 6px; }
+    .meta-btns { display: flex; gap: 6px; margin-top: 12px; }
+    .btn-meta-plus {
+      flex: 1; padding: 8px; background: rgba(5,150,105,0.1);
+      border: 0.5px solid rgba(5,150,105,0.3); border-radius: var(--r-sm);
+      color: var(--emerald); font-size: 12px; font-weight: 600;
+      font-family: inherit; cursor: pointer; transition: all .15s;
+    }
+    .btn-meta-plus:hover { background: rgba(5,150,105,0.18); }
     .btn-meta-del {
-      padding: 7px 10px; background: transparent; border: 1px solid var(--bg-line);
-      border-radius: var(--radius-sm); color: var(--text-3); font-size: 0.75rem;
-      cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif;
+      padding: 8px 10px; background: transparent;
+      border: 0.5px solid var(--border-strong); border-radius: var(--r-sm);
+      color: var(--text-3); font-size: 13px; cursor: pointer; transition: all .15s;
     }
-    .btn-meta-del:hover { border-color: var(--red); color: var(--red); }
+    .btn-meta-del:hover { color: var(--red); border-color: var(--red); }
     .btn-add-meta {
-      grid-column: 1 / -1; padding: 14px; background: transparent;
-      border: 1px dashed var(--bg-line); border-radius: var(--radius-md);
-      color: var(--text-3); font-size: 0.85rem; font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s;
+      grid-column: 1/-1; padding: 16px; background: transparent;
+      border: 0.5px dashed var(--border-strong); border-radius: var(--r-lg);
+      color: var(--text-3); font-size: 15px; font-family: inherit;
+      cursor: pointer; transition: all .15s;
     }
-    .btn-add-meta:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-add-meta:hover { border-color: var(--emerald); color: var(--emerald); }
+    .btn-add-budget {
+      width: 100%; padding: 14px; background: transparent;
+      border: 0.5px dashed var(--border-strong); border-radius: var(--r-md);
+      color: var(--text-3); font-size: 15px; font-family: inherit;
+      cursor: pointer; transition: all .15s; margin-top: 10px;
+    }
+    .btn-add-budget:hover { border-color: var(--emerald); color: var(--emerald); }
+
+    /* ── EMPTY STATE ── */
+    .empty { text-align: center; padding: 40px 20px; color: var(--text-3); font-size: 14px; }
+    .empty-icon { font-size: 36px; display: block; margin-bottom: 10px; opacity: 0.4; }
 
     /* ── MODAL ── */
-    .modal-overlay {
+    .overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6); z-index: 200;
-      align-items: center; justify-content: center; padding: 20px;
+      background: rgba(0,0,0,0.5); z-index: 200;
+      align-items: flex-end; justify-content: center; padding: 0;
+      backdrop-filter: blur(4px);
     }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: var(--bg-card); border: 1px solid var(--bg-line);
-      border-radius: var(--radius-lg); padding: 24px; width: 100%; max-width: 360px; box-shadow: var(--shadow);
+    .overlay.open { display: flex; }
+    .modal-sheet {
+      background: var(--surface); width: 100%; max-width: 640px;
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 12px 20px max(24px, env(safe-area-inset-bottom));
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+      animation: slideUp .25s cubic-bezier(.4,0,.2,1);
     }
-    .modal-title { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; color: var(--text-1); }
-    .modal-box .form-group input, .modal-box .form-group select { background: var(--bg-mid); }
-    .modal-btn-row { display: flex; gap: 10px; margin-top: 16px; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 999px; margin: 0 auto 18px; }
+    .modal-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; color: var(--text-1); margin-bottom: 18px; }
+    .modal-sheet .field input, .modal-sheet .field select { background: var(--surface-2); }
+    .modal-field { margin-bottom: 12px; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
+    .modal-btns .btn-primary { flex: 2; width: auto; }
+    .modal-btns .btn-secondary { flex: 1; width: auto; display: block; }
 
     /* ── BOTTOM NAV ── */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
-      background: var(--bg-card); border-top: 1px solid var(--bg-line);
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
       display: flex; justify-content: space-around;
-      padding: 10px 0 max(10px, env(safe-area-inset-bottom));
+      padding: 8px 0 max(12px, env(safe-area-inset-bottom));
     }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      text-decoration: none; color: var(--text-3); font-size: 0.62rem; font-weight: 600;
-      letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
-      border: none; background: transparent; padding: 4px 12px; border-radius: var(--radius-sm); transition: color .15s;
+    .nav-btn {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px; border: none; background: transparent; cursor: pointer;
+      color: var(--text-3); font-size: 10px; font-weight: 500;
+      font-family: inherit; letter-spacing: 0.02em; padding: 4px 16px;
+      border-radius: var(--r-sm); transition: color .15s;
     }
-    .nav-item .nav-icon { font-size: 1.3rem; }
-    .nav-item.active { color: var(--accent); }
+    .nav-btn .ni { font-size: 22px; line-height: 1; }
+    .nav-btn.active { color: var(--emerald); }
 
-    .tab-section { display: none; }
-    .tab-section.active { display: block; }
+    /* ── TABS ── */
+    .tab { display: none; }
+    .tab.active { display: block; }
 
-    @media (max-width: 420px) {
-      .summary-card .amount { font-size: 1.6rem; }
-      .summary-card.main .amount { font-size: 2rem; }
-      .charts-grid { grid-template-columns: 1fr; }
+    @media (max-width: 400px) {
+      .chart-grid { grid-template-columns: 1fr; }
       .meta-grid { grid-template-columns: 1fr; }
-      .form-row { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .hero-amount { font-size: 36px; }
     }
   </style>
 </head>
 <body>
 
+<!-- TOP BAR -->
 <div class="top-bar">
-  <div class="brand">
-    <div class="brand-icon">💼</div>
-    <div class="brand-name">Alkaranta <span>Finanzas</span></div>
-  </div>
-  <div class="mode-tabs">
-    <button class="mode-tab active" id="btnPersonal" onclick="cambiarModo('personal')">Personal</button>
-    <button class="mode-tab" id="btnLaboral" onclick="cambiarModo('laboral')">Laboral</button>
+  <span class="brand-name">Alkaranta <em>Finanzas</em></span>
+  <div class="mode-pill">
+    <button class="mode-btn active" id="btnPersonal" onclick="cambiarModo('personal')">Personal</button>
+    <button class="mode-btn" id="btnLaboral" onclick="cambiarModo('laboral')">Laboral</button>
   </div>
 </div>
 
 <div class="page">
 
-  <!-- INICIO -->
-  <div class="tab-section active" id="sec-inicio">
-    <div style="height:20px"></div>
-    <div class="summary-grid">
-      <div class="summary-card main">
-        <div class="label">Saldo total</div>
-        <div class="amount" id="saldoTotal">$0</div>
-        <div class="sub-label" id="periodoLabel">Todos los períodos</div>
-      </div>
-      <div class="summary-card card-ing">
-        <div class="label">Ingresos</div>
-        <div class="amount" id="totalIngresos">$0</div>
-        <div class="card-accent-line"></div>
-      </div>
-      <div class="summary-card card-egr">
-        <div class="label">Egresos</div>
-        <div class="amount" id="totalEgresos">$0</div>
-        <div class="card-accent-line"></div>
+  <!-- ── INICIO ── -->
+  <div class="tab active" id="sec-inicio">
+    <div class="hero">
+      <div class="hero-label">Saldo total</div>
+      <div class="hero-amount" id="saldoTotal">$0</div>
+      <div class="hero-period" id="periodoLabel">Todos los períodos</div>
+      <div class="hero-row">
+        <div class="hero-stat">
+          <div class="hero-stat-label">Ingresos</div>
+          <div class="hero-stat-val" id="totalIngresos">$0</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">Egresos</div>
+          <div class="hero-stat-val" id="totalEgresos">$0</div>
+        </div>
       </div>
     </div>
-    <div class="section-title">Resumen visual</div>
-    <div class="charts-grid">
-      <div class="chart-card"><h3>Distribución</h3><canvas id="graficoTorta"></canvas></div>
-      <div class="chart-card"><h3>Top egresos</h3><canvas id="graficoCat"></canvas></div>
-      <div class="chart-card wide"><h3>Últimos 12 meses</h3><canvas id="graficoBarras"></canvas></div>
+
+    <div class="sec-label">Resumen</div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-label">Distribución</div><canvas id="graficoTorta"></canvas></div>
+      <div class="chart-card"><div class="chart-label">Top egresos</div><canvas id="graficoCat"></canvas></div>
+      <div class="chart-card wide"><div class="chart-label">Últimos 12 meses</div><canvas id="graficoBarras"></canvas></div>
     </div>
-    <div class="section-title">Por categoría</div>
-    <div class="cat-card" id="listaCategorias"></div>
+
+    <div class="sec-label">Por categoría</div>
+    <div class="list-group" id="listaCategorias"></div>
+    <div style="height:8px"></div>
   </div>
 
-  <!-- MOVIMIENTOS -->
-  <div class="tab-section" id="sec-movimientos">
-    <div style="height:20px"></div>
-    <div class="section-title">Nuevo movimiento</div>
+  <!-- ── MOVIMIENTOS ── -->
+  <div class="tab" id="sec-movimientos">
+    <div class="sec-label" style="margin-top:20px">Nuevo movimiento</div>
     <div class="form-card">
-      <div class="date-row">
-        <div class="form-group"><label>Fecha</label><input type="date" id="fecha"></div>
-        <button class="btn-today" onclick="resetearFecha()">Hoy</button>
+      <div class="form-section">
+        <div class="form-section-title">Fecha y tipo</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div class="field" style="flex:1"><label>Fecha</label><input type="date" id="fecha"></div>
+          <div style="display:flex;align-items:flex-end"><button class="btn-today" onclick="resetearFecha()">Hoy</button></div>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Tipo</label><select id="tipo" onchange="actualizarCategorias()"><option value="Ingreso">Ingreso</option><option value="Egreso">Egreso</option></select></div>
+          <div class="field"><label>Categoría</label><select id="categoria"></select></div>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label>Tipo</label><select id="tipo" onchange="actualizarCategorias()"><option value="Ingreso">Ingreso</option><option value="Egreso">Egreso</option></select></div>
-        <div class="form-group"><label>Categoría</label><select id="categoria"></select></div>
+      <div class="form-section">
+        <div class="form-section-title">Detalle</div>
+        <div class="form-grid">
+          <div class="field"><label>Monto</label><input type="number" id="monto" placeholder="0" min="0"></div>
+          <div class="field"><label>Descripción</label><input type="text" id="descripcion" placeholder="Opcional"></div>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label>Monto</label><input type="number" id="monto" placeholder="0" min="0"></div>
-        <div class="form-group"><label>Descripción</label><input type="text" id="descripcion" placeholder="Opcional"></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" id="btnGuardar" onclick="guardarMovimiento()">💾 Guardar</button>
-        <button class="btn btn-cancel" id="btnCancelar" onclick="cancelarEdicion()">✕ Cancelar</button>
+      <div class="form-section">
+        <div style="display:flex;gap:10px">
+          <button class="btn-primary" id="btnGuardar" onclick="guardarMovimiento()">Guardar</button>
+          <button class="btn-secondary" id="btnCancelar" onclick="cancelarEdicion()">Cancelar</button>
+        </div>
       </div>
     </div>
-    <div class="section-title">Historial</div>
-    <div class="filters-row">
+
+    <div class="sec-label">Historial</div>
+    <div class="filter-row">
       <select id="filtroMes" onchange="renderizar()"><option value="">Todos los meses</option></select>
       <select id="filtroTipo" onchange="renderizar()"><option value="">Todos</option><option value="Ingreso">Ingresos</option><option value="Egreso">Egresos</option></select>
-      <button class="btn-export" onclick="exportarCSV()">📥 CSV</button>
+      <button class="btn-ghost" onclick="exportarCSV()">Exportar</button>
     </div>
-    <div class="tabla-wrap">
-      <div class="tabla-scroll">
-        <table>
-          <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Monto</th><th>Descripción</th><th></th></tr></thead>
-          <tbody id="tablaMovimientos"></tbody>
-        </table>
-      </div>
-      <p id="sinMovimientos" class="sin-datos" style="display:none">Sin movimientos para mostrar.</p>
-    </div>
+    <div class="list-group" id="listaMovimientos"></div>
+    <div style="height:8px"></div>
   </div>
 
-  <!-- PRESUPUESTO -->
-  <div class="tab-section" id="sec-presupuesto">
-    <div style="height:20px"></div>
-    <div class="section-title">Presupuesto mensual</div>
-    <p style="font-size:0.85rem;color:var(--text-3);margin-bottom:16px">Definí cuánto querés gastar por categoría este mes.</p>
-    <div class="budget-card" id="budgetList"></div>
+  <!-- ── PRESUPUESTO ── -->
+  <div class="tab" id="sec-presupuesto">
+    <div class="sec-label" style="margin-top:20px">Presupuesto mensual</div>
+    <p style="font-size:13px;color:var(--text-3);margin-bottom:14px">Seguí tus límites de gasto por categoría.</p>
+    <div class="list-group" id="budgetList"></div>
     <button class="btn-add-budget" onclick="abrirModalPresupuesto()">+ Agregar categoría</button>
+    <div style="height:8px"></div>
   </div>
 
-  <!-- METAS -->
-  <div class="tab-section" id="sec-metas">
-    <div style="height:20px"></div>
-    <div class="section-title">Metas de ahorro</div>
-    <p style="font-size:0.85rem;color:var(--text-3);margin-bottom:16px">Registrá tus objetivos y seguí tu progreso.</p>
+  <!-- ── METAS ── -->
+  <div class="tab" id="sec-metas">
+    <div class="sec-label" style="margin-top:20px">Metas de ahorro</div>
+    <p style="font-size:13px;color:var(--text-3);margin-bottom:14px">Seguí tus objetivos y sumá progreso cuando quieras.</p>
     <div class="meta-grid" id="metaGrid"></div>
+    <div style="height:8px"></div>
   </div>
 
 </div>
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="nav-item active" onclick="cambiarTab('inicio',this)"><span class="nav-icon">📊</span>Inicio</button>
-  <button class="nav-item" onclick="cambiarTab('movimientos',this)"><span class="nav-icon">💸</span>Movimientos</button>
-  <button class="nav-item" onclick="cambiarTab('presupuesto',this)"><span class="nav-icon">🎯</span>Presupuesto</button>
-  <button class="nav-item" onclick="cambiarTab('metas',this)"><span class="nav-icon">⭐</span>Metas</button>
+  <button class="nav-btn active" onclick="cambiarTab('inicio',this)"><span class="ni">📊</span>Inicio</button>
+  <button class="nav-btn" onclick="cambiarTab('movimientos',this)"><span class="ni">💸</span>Movimientos</button>
+  <button class="nav-btn" onclick="cambiarTab('presupuesto',this)"><span class="ni">🎯</span>Presupuesto</button>
+  <button class="nav-btn" onclick="cambiarTab('metas',this)"><span class="ni">⭐</span>Metas</button>
 </nav>
 
 <!-- MODAL PRESUPUESTO -->
-<div class="modal-overlay" id="modalPresupuesto">
-  <div class="modal-box">
+<div class="overlay" id="modalPresupuesto">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
     <div class="modal-title">Agregar presupuesto</div>
-    <div class="form-group"><label>Categoría</label><select id="budgetCat"></select></div>
-    <div class="form-group"><label>Límite mensual</label><input type="number" id="budgetMonto" placeholder="0" min="0"></div>
-    <div class="modal-btn-row">
-      <button class="btn btn-primary" onclick="guardarPresupuesto()">Guardar</button>
-      <button class="btn btn-cancel" style="display:block" onclick="cerrarModales()">Cancelar</button>
+    <div class="modal-field field"><label>Categoría</label><select id="budgetCat"></select></div>
+    <div class="modal-field field"><label>Límite mensual</label><input type="number" id="budgetMonto" placeholder="0" min="0"></div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="guardarPresupuesto()">Guardar</button>
+      <button class="btn-secondary" onclick="cerrarModales()">Cancelar</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL META NUEVA -->
-<div class="modal-overlay" id="modalMeta">
-  <div class="modal-box">
-    <div class="modal-title">Nueva meta de ahorro</div>
-    <div class="form-group"><label>Nombre</label><input type="text" id="metaNombre" placeholder="Ej: Vacaciones, Auto..."></div>
-    <div class="form-group"><label>Objetivo ($)</label><input type="number" id="metaObjetivo" placeholder="0" min="0"></div>
-    <div class="form-group"><label>Ya ahorrado ($)</label><input type="number" id="metaAhorrado" placeholder="0" min="0"></div>
-    <div class="form-group"><label>Ícono</label>
+<div class="overlay" id="modalMeta">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nueva meta</div>
+    <div class="modal-field field"><label>Nombre</label><input type="text" id="metaNombre" placeholder="Ej: Vacaciones, Auto..."></div>
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="field"><label>Objetivo ($)</label><input type="number" id="metaObjetivo" placeholder="0" min="0"></div>
+      <div class="field"><label>Ya ahorrado ($)</label><input type="number" id="metaAhorrado" placeholder="0" min="0"></div>
+    </div>
+    <div class="modal-field field"><label>Ícono</label>
       <select id="metaIcono">
         <option value="🏖️">🏖️ Vacaciones</option>
         <option value="🚗">🚗 Auto</option>
@@ -443,21 +519,22 @@
         <option value="⭐">⭐ Otro</option>
       </select>
     </div>
-    <div class="modal-btn-row">
-      <button class="btn btn-primary" onclick="guardarMeta()">Guardar</button>
-      <button class="btn btn-cancel" style="display:block" onclick="cerrarModales()">Cancelar</button>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="guardarMeta()">Guardar</button>
+      <button class="btn-secondary" onclick="cerrarModales()">Cancelar</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL AGREGAR AHORRO -->
-<div class="modal-overlay" id="modalAhorro">
-  <div class="modal-box">
+<div class="overlay" id="modalAhorro">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
     <div class="modal-title" id="modalAhorroTitulo">Agregar ahorro</div>
-    <div class="form-group"><label>Monto a agregar ($)</label><input type="number" id="ahorroMonto" placeholder="0" min="0"></div>
-    <div class="modal-btn-row">
-      <button class="btn btn-primary" onclick="confirmarAhorro()">Agregar</button>
-      <button class="btn btn-cancel" style="display:block" onclick="cerrarModales()">Cancelar</button>
+    <div class="modal-field field"><label>Monto a agregar ($)</label><input type="number" id="ahorroMonto" placeholder="0" min="0"></div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="confirmarAhorro()">Agregar</button>
+      <button class="btn-secondary" onclick="cerrarModales()">Cancelar</button>
     </div>
   </div>
 </div>
