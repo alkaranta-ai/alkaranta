@@ -562,11 +562,13 @@
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modalAhorroTitulo">Agregar ahorro</div>
-    <div class="modal-field field"><label>Monto a agregar ($)</label><input type="number" id="ahorroMonto" placeholder="0" min="0"></div>
-    <div class="modal-btns">
+    <!-- Botones ARRIBA del input: cuando sube el teclado en iOS,
+         los botones ya quedaron visibles por encima del campo -->
+    <div class="modal-btns" style="margin-top:0; margin-bottom:16px">
       <button class="btn-primary" onclick="confirmarAhorro()">Agregar</button>
       <button class="btn-secondary" onclick="cerrarModales()">Cancelar</button>
     </div>
+    <div class="modal-field field"><label>Monto a agregar ($)</label><input type="number" id="ahorroMonto" placeholder="0" min="0" inputmode="decimal"></div>
   </div>
 </div>
 
@@ -577,37 +579,29 @@
     window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
   }
 
-  // ── FIX TECLADO VIRTUAL ──
+  // ── FIX TECLADO VIRTUAL (Android + iOS) ──
+  // iOS Safari no mueve elementos fixed cuando sube el teclado.
+  // Estrategia: mover el overlay completo con margin-bottom igual
+  // a la altura del teclado, usando visualViewport.
+
   function ajustarModalAlTeclado() {
-    const sheet = document.querySelector('.overlay.open .modal-sheet');
-    if (!sheet) return;
+    const overlay = document.querySelector('.overlay.open');
+    if (!overlay) return;
     const vv = window.visualViewport;
     if (!vv) return;
 
-    // Altura del teclado = diferencia entre la ventana total y el viewport visible
-    const tecladoAlto = window.innerHeight - vv.height;
+    const tecladoAlto = window.innerHeight - vv.height - vv.offsetTop;
+    const subida = Math.max(0, tecladoAlto);
 
-    if (tecladoAlto <= 50) {
-      // Teclado cerrado (margen de 50px por barras del sistema)
-      sheet.style.transform = 'translateY(0)';
-      return;
-    }
-
-    // Cuánto ocupa el sheet en pantalla
-    const sheetRect = sheet.getBoundingClientRect();
-    const sheetBottom = sheetRect.bottom;
-    const viewportBottom = vv.offsetTop + vv.height;
-
-    // Solo subir lo que sobresale del área visible, con 12px de margen
-    const sobresale = sheetBottom - viewportBottom + 12;
-    if (sobresale > 0) {
-      sheet.style.transform = `translateY(-${sobresale}px)`;
-    }
+    // Mover el overlay entero hacia arriba empujando su padding-bottom
+    // Esto funciona en iOS Safari donde translateY en fixed no funciona
+    overlay.style.paddingBottom = subida > 0 ? subida + 'px' : '0px';
   }
 
   function resetearModal() {
-    const sheet = document.querySelector('.modal-sheet');
-    if (sheet) sheet.style.transform = 'translateY(0)';
+    document.querySelectorAll('.overlay').forEach(o => {
+      o.style.paddingBottom = '0px';
+    });
   }
 
   if (window.visualViewport) {
@@ -615,7 +609,15 @@
     window.visualViewport.addEventListener('scroll', ajustarModalAlTeclado);
   }
 
-  // Cuando se cierra el modal, resetear el transform
+  // Al abrir el teclado en iOS, hacer scroll del sheet para mostrar los botones
+  document.getElementById('ahorroMonto').addEventListener('focus', () => {
+    setTimeout(() => {
+      ajustarModalAlTeclado();
+      const sheet = document.querySelector('#modalAhorro .modal-sheet');
+      if (sheet) sheet.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 350); // esperar a que el teclado termine de subir
+  });
+
   document.addEventListener('click', e => {
     if (e.target.classList.contains('overlay')) resetearModal();
   });
