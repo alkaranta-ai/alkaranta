@@ -3,17 +3,17 @@ const categorias = {
   Egreso:  ["Supermercado","Combustible","Servicios","Internet","Telefonía","Salud","Educación","Impuestos","Tarjetas","Entretenimiento","Otros"]
 };
 
-let movimientos   = JSON.parse(localStorage.getItem("movimientos"))   || [];
-let presupuestos  = JSON.parse(localStorage.getItem("presupuestos"))  || {};
-let metas         = JSON.parse(localStorage.getItem("metas"))         || [];
-let modoActual    = 'personal';
+let movimientos  = JSON.parse(localStorage.getItem("movimientos"))  || [];
+let presupuestos = JSON.parse(localStorage.getItem("presupuestos")) || {};
+let metas        = JSON.parse(localStorage.getItem("metas"))        || [];
+let modoActual   = 'personal';
 let editandoIndice = null;
+let metaAhorroIdx  = null;
 let graficoTorta = null, graficoBarras = null, graficoCat = null;
 
 // ── INIT ──
 document.addEventListener("DOMContentLoaded", () => {
-  const hoy = new Date().toISOString().split("T")[0];
-  document.getElementById("fecha").value = hoy;
+  document.getElementById("fecha").value = new Date().toISOString().split("T")[0];
   actualizarCategorias();
   poblarFiltroMeses();
   renderizar();
@@ -40,6 +40,7 @@ function cambiarModo(modo) {
   poblarFiltroMeses();
   renderizar();
   renderPresupuesto();
+  renderMetas();
 }
 
 function perteneceAlModo(m) {
@@ -58,7 +59,7 @@ function actualizarCategorias() {
   });
 }
 
-// ── GUARDAR MOVIMIENTO ──
+// ── MOVIMIENTOS ──
 function guardarMovimiento() {
   const fecha       = document.getElementById("fecha").value;
   const tipo        = document.getElementById("tipo").value;
@@ -184,33 +185,29 @@ function renderizar() {
   }
 
   const sinMov = document.getElementById("sinMovimientos");
-  if (filtrados.length === 0) {
-    sinMov.style.display = "block";
-  } else {
-    sinMov.style.display = "none";
-    [...filtrados].reverse().forEach(mov => {
-      const idxReal = movimientos.indexOf(mov);
-      const fecha = mov.fecha ? new Date(mov.fecha + "T00:00:00").toLocaleDateString("es-AR") : "";
-      const fila = document.createElement("tr");
-      fila.innerHTML = `
-        <td>${fecha}</td>
-        <td><span class="badge badge-${mov.tipo.toLowerCase()}">${mov.tipo}</span></td>
-        <td>${mov.categoria}</td>
-        <td class="monto-${mov.tipo.toLowerCase()}">$${mov.monto.toLocaleString("es-AR")}</td>
-        <td style="color:var(--text-3);font-size:0.82rem">${mov.descripcion || "—"}</td>
-        <td>
-          <button class="btn-accion" onclick="editarMovimiento(${idxReal})">✏️</button>
-          <button class="btn-accion" onclick="eliminarMovimiento(${idxReal})">🗑️</button>
-        </td>`;
-      tabla.appendChild(fila);
-    });
-  }
+  sinMov.style.display = filtrados.length === 0 ? "block" : "none";
+
+  [...filtrados].reverse().forEach(mov => {
+    const idxReal = movimientos.indexOf(mov);
+    const fecha = mov.fecha ? new Date(mov.fecha + "T00:00:00").toLocaleDateString("es-AR") : "";
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${fecha}</td>
+      <td><span class="badge badge-${mov.tipo.toLowerCase()}">${mov.tipo}</span></td>
+      <td>${mov.categoria}</td>
+      <td class="monto-${mov.tipo.toLowerCase()}">$${mov.monto.toLocaleString("es-AR")}</td>
+      <td style="color:var(--text-3);font-size:0.82rem">${mov.descripcion || "—"}</td>
+      <td>
+        <button class="btn-accion" onclick="editarMovimiento(${idxReal})">✏️</button>
+        <button class="btn-accion" onclick="eliminarMovimiento(${idxReal})">🗑️</button>
+      </td>`;
+    tabla.appendChild(fila);
+  });
 
   actualizarGraficos(ingresos, egresos, filtrados);
   actualizarResumenCategorias(filtrados);
 }
 
-// ── CATEGORÍAS RESUMEN ──
 function actualizarResumenCategorias(filtrados) {
   const contenedor = document.getElementById("listaCategorias");
   contenedor.innerHTML = "";
@@ -231,7 +228,9 @@ function actualizarResumenCategorias(filtrados) {
 
 // ── GRÁFICOS ──
 function actualizarGraficos(ingresos, egresos, filtrados) {
-  // Torta
+  const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--text-3').trim();
+  const gridColor = "rgba(128,128,128,0.1)";
+
   const ctxT = document.getElementById("graficoTorta").getContext("2d");
   if (graficoTorta) graficoTorta.destroy();
   graficoTorta = new Chart(ctxT, {
@@ -242,12 +241,11 @@ function actualizarGraficos(ingresos, egresos, filtrados) {
     },
     options: {
       cutout: "68%",
-      plugins: { legend: { position: "bottom", labels: { color: "#94A3B8", font: { size: 11 }, boxWidth: 12 } } },
+      plugins: { legend: { position: "bottom", labels: { color: tickColor, font: { size: 11 }, boxWidth: 12 } } },
       animation: { duration: 400 }
     }
   });
 
-  // Por categoría (horizontal bar)
   const resumen = {};
   filtrados.filter(m => m.tipo === "Egreso").forEach(m => {
     resumen[m.categoria] = (resumen[m.categoria] || 0) + m.monto;
@@ -265,14 +263,13 @@ function actualizarGraficos(ingresos, egresos, filtrados) {
       indexAxis: 'y',
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#64748B", font: { size: 10 } } },
-        y: { grid: { display: false }, ticks: { color: "#94A3B8", font: { size: 10 } } }
+        x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } },
+        y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 10 } } }
       },
       animation: { duration: 400 }
     }
   });
 
-  // Barras 12 meses
   const hoy = new Date();
   const meses = [], datosIng = [], datosEgr = [];
   for (let i = 11; i >= 0; i--) {
@@ -299,10 +296,10 @@ function actualizarGraficos(ingresos, egresos, filtrados) {
       ]
     },
     options: {
-      plugins: { legend: { position: "bottom", labels: { color: "#94A3B8", font: { size: 11 }, boxWidth: 12 } } },
+      plugins: { legend: { position: "bottom", labels: { color: tickColor, font: { size: 11 }, boxWidth: 12 } } },
       scales: {
-        x: { grid: { display: false }, ticks: { color: "#64748B", font: { size: 10 } } },
-        y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#64748B", font: { size: 10 } } }
+        x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 10 } } },
+        y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
       },
       animation: { duration: 400 }
     }
@@ -326,27 +323,24 @@ function guardarPresupuesto() {
   const cat   = document.getElementById("budgetCat").value;
   const monto = Number(document.getElementById("budgetMonto").value);
   if (!monto || monto <= 0) { alert("Ingresá un monto válido."); return; }
-  const key = modoActual + "_" + cat;
-  presupuestos[key] = monto;
+  presupuestos[modoActual + "_" + cat] = monto;
   guardarLS();
   cerrarModales();
   renderPresupuesto();
 }
 
 function renderPresupuesto() {
-  const hoy = new Date();
-  const mesActual = hoy.toISOString().slice(0, 7);
+  const mesActual = new Date().toISOString().slice(0, 7);
   const contenedor = document.getElementById("budgetList");
   contenedor.innerHTML = "";
+  const keys = Object.keys(presupuestos).filter(k => k.startsWith(modoActual + "_"));
 
-  const keysDelModo = Object.keys(presupuestos).filter(k => k.startsWith(modoActual + "_"));
-
-  if (keysDelModo.length === 0) {
+  if (keys.length === 0) {
     contenedor.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-size:0.88rem">No hay presupuestos definidos aún.</div>';
     return;
   }
 
-  keysDelModo.forEach(key => {
+  keys.forEach(key => {
     const cat    = key.replace(modoActual + "_", "");
     const limite = presupuestos[key];
     const gastado = movimientos.filter(m =>
@@ -393,6 +387,22 @@ function guardarMeta() {
   renderMetas();
 }
 
+function abrirModalAhorro(idx) {
+  metaAhorroIdx = idx;
+  document.getElementById("modalAhorroTitulo").textContent = "Agregar ahorro — " + metas[idx].nombre;
+  document.getElementById("ahorroMonto").value = "";
+  document.getElementById("modalAhorro").classList.add("open");
+}
+
+function confirmarAhorro() {
+  const monto = Number(document.getElementById("ahorroMonto").value);
+  if (!monto || monto <= 0) { alert("Ingresá un monto válido."); return; }
+  metas[metaAhorroIdx].ahorrado += monto;
+  guardarLS();
+  cerrarModales();
+  renderMetas();
+}
+
 function eliminarMeta(idx) {
   if (!confirm("¿Eliminar esta meta?")) return;
   metas.splice(idx, 1);
@@ -412,14 +422,17 @@ function renderMetas() {
     const card = document.createElement("div");
     card.className = "meta-card";
     card.innerHTML = `
-      <button class="meta-delete" onclick="eliminarMeta(${m._idx})">✕</button>
       <div class="meta-icon">${m.icono}</div>
       <div class="meta-name">${m.nombre}</div>
       <div class="meta-amounts">$<span>${m.ahorrado.toLocaleString("es-AR")}</span> de $${m.objetivo.toLocaleString("es-AR")}</div>
-      <div class="progress-bar" style="margin-bottom:8px">
+      <div class="progress-bar" style="margin-bottom:6px">
         <div class="progress-fill ${claseBar}" style="width:${pct}%"></div>
       </div>
-      <div class="meta-pct">${pct}%</div>`;
+      <div class="meta-pct">${pct}%</div>
+      <div class="meta-actions">
+        <button class="btn-meta-add" onclick="abrirModalAhorro(${m._idx})">+ Agregar ahorro</button>
+        <button class="btn-meta-del" onclick="eliminarMeta(${m._idx})">🗑️</button>
+      </div>`;
     grid.appendChild(card);
   });
 
@@ -442,12 +455,11 @@ document.querySelectorAll(".modal-overlay").forEach(m => {
 // ── UTILS ──
 function exportarCSV() {
   if (movimientos.length === 0) { alert("No hay movimientos para exportar."); return; }
-  const encabezado = ["Fecha","Tipo","Categoría","Monto","Descripción","Entidad"];
+  const enc = ["Fecha","Tipo","Categoría","Monto","Descripción","Entidad"];
   const filas = movimientos.map(m => [m.fecha, m.tipo, m.categoria, m.monto, m.descripcion || "", m.entidad || "personal"]);
-  const csv = [encabezado, ...filas].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const csv = [enc, ...filas].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
+  a.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
   a.download = `finanzas-${modoActual}-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
 }
