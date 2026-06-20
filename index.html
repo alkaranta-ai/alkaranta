@@ -23,8 +23,6 @@
       --red:          #F43F5E;
       --amber:        #F59E0B;
       --blue:         #3B82F6;
-      --gold:         #D4A02C;
-      --gold-light:   #F1CE6B;
 
       /* Modo claro fijo — no depende del sistema */
       --bg:            #EEF1F0;
@@ -472,102 +470,14 @@
     .tab { display: none; }
     .tab.active { display: block; }
 
-    /* ════════════════════════════════════════════
-       GAMIFICACIÓN — Logros y Nivel
-    ════════════════════════════════════════════ */
-
-    /* Tarjeta de nivel con anillo de progreso circular */
-    .level-card {
-      display: flex; align-items: center; gap: 18px;
-      border-radius: var(--r-xl);
-      padding: 20px;
-      margin: 20px 0 16px;
-    }
-    .level-ring {
-      position: relative; width: 88px; height: 88px; flex-shrink: 0;
-    }
-    .level-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    .level-ring-bg {
-      fill: none; stroke: var(--surface-2); stroke-width: 8;
-    }
-    .level-ring-fill {
-      fill: none; stroke: var(--gold); stroke-width: 8; stroke-linecap: round;
-      transition: stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);
-    }
-    .level-ring-label {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .level-ring-num { font-size: 26px; font-weight: 700; color: var(--text-1); letter-spacing: -0.5px; line-height: 1; }
-    .level-ring-sub { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; color: var(--text-3); margin-top: 2px; }
-    .level-info { flex: 1; min-width: 0; }
-    .level-xp-row { font-size: 14px; font-weight: 600; color: var(--text-1); }
-    .level-xp-total { font-size: 13px; font-weight: 400; color: var(--text-3); }
-    .level-next { font-size: 12px; color: var(--text-3); margin-top: 8px; }
-
-    /* Grid de logros */
-    .logros-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-      margin-bottom: 12px;
-    }
-    .logro-card {
-      border-radius: var(--r-lg);
-      padding: 16px 14px;
-      text-align: center;
-      transition: opacity .2s, transform .2s;
-    }
-    .logro-card.locked { opacity: 0.5; }
-    .logro-icon { font-size: 28px; display: block; margin-bottom: 8px; }
-    .logro-name { font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 4px; line-height: 1.25; }
-    .logro-desc { font-size: 11px; color: var(--text-3); line-height: 1.4; margin-bottom: 8px; min-height: 28px; }
-    .logro-xp {
-      display: inline-block; font-size: 11px; font-weight: 700;
-      color: var(--gold); background: rgba(212,160,44,0.14);
-      border-radius: var(--r-pill); padding: 3px 10px;
-    }
-    .logro-card.locked .logro-xp { color: var(--text-3); background: var(--surface-2); }
-
-    /* Toasts de logro/nivel */
-    #toastContainer {
-      position: fixed;
-      top: max(12px, env(safe-area-inset-top));
-      left: 16px; right: 16px;
-      z-index: 1000;
-      display: flex; flex-direction: column; gap: 8px;
-      pointer-events: none;
-      max-width: 480px; margin: 0 auto;
-    }
-    .gam-toast {
-      display: flex; align-items: center; gap: 12px;
-      background: rgba(29,29,31,0.92);
-      -webkit-backdrop-filter: blur(18px) saturate(180%);
-      backdrop-filter: blur(18px) saturate(180%);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: var(--r-lg);
-      padding: 12px 14px;
-      box-shadow: 0 14px 34px rgba(0,0,0,0.30);
-      opacity: 0; transform: translateY(-14px) scale(0.96);
-      transition: opacity .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1);
-    }
-    .gam-toast.show { opacity: 1; transform: translateY(0) scale(1); }
-    .gam-toast-icon { font-size: 24px; flex-shrink: 0; }
-    .gam-toast-body { flex: 1; min-width: 0; }
-    .gam-toast-title { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.55); }
-    .gam-toast-name { font-size: 14px; font-weight: 600; color: #fff; margin-top: 1px; }
-    .gam-toast-xp { font-size: 12px; font-weight: 700; color: var(--gold-light); flex-shrink: 0; }
-
     @media (max-width: 400px) {
       .meta-grid { grid-template-columns: 1fr; }
       .form-grid { grid-template-columns: 1fr; }
       .hero-amount { font-size: 36px; }
-      .logros-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
 <body>
-
-<!-- TOASTS DE LOGRO / NIVEL -->
-<div id="toastContainer"></div>
 
 <!-- TOP BAR (fija) -->
 <div class="top-bar">
@@ -696,18 +606,6 @@
     <div style="height:8px"></div>
   </div>
 
-  <!-- ── LOGROS ── -->
-  <div class="tab" id="sec-logros">
-    <div id="logrosHead"></div>
-
-    <div class="sec-label">Constancia</div>
-    <div class="dash-grid" id="logrosRacha"></div>
-
-    <div class="sec-label">Todos los logros</div>
-    <div class="logros-grid" id="logrosGrid"></div>
-    <div style="height:8px"></div>
-  </div>
-
 </div>
 
 <!-- BOTTOM NAV -->
@@ -727,10 +625,6 @@
   <button class="nav-btn" onclick="cambiarTab('metas',this)">
     <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.2L12 16.9 6.4 20l1.4-6.2-4.8-4.3 6.4-.6L12 3z"/></svg></span>
     Metas
-  </button>
-  <button class="nav-btn" onclick="cambiarTab('logros',this)">
-    <span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a1 1 0 0 0-1 1c0 2.5 1.5 4 4 4.3M17 6h3a1 1 0 0 1 1 1c0 2.5-1.5 4-4 4.3"/></svg></span>
-    Logros
   </button>
 </nav>
 
@@ -790,8 +684,6 @@
 </div>
 
 <script src="app.js"></script>
-<script src="gamification.js"></script>
-<script src="gamification-ui.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
