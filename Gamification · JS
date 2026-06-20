@@ -147,8 +147,19 @@ const gam = (() => {
       const raw = localStorage.getItem("gamificacion");
       if (!raw) return estadoDefault();
       const data = JSON.parse(raw);
-      return { ...estadoDefault(), ...data };
+      // FIX: si el JSON guardado está corrupto o le faltan campos
+      // (por ejemplo logrosDesbloqueados no es array), se pisa con
+      // el default en lugar de arrastrar un estado roto para siempre.
+      const base = estadoDefault();
+      const limpio = { ...base, ...data };
+      if (!Array.isArray(limpio.logrosDesbloqueados)) limpio.logrosDesbloqueados = [];
+      if (!Array.isArray(limpio.fechasConMovimiento)) limpio.fechasConMovimiento = [];
+      if (!Array.isArray(limpio.mesesPresupuestoOkRegistrados)) limpio.mesesPresupuestoOkRegistrados = [];
+      if (typeof limpio.xp !== "number" || isNaN(limpio.xp)) limpio.xp = 0;
+      if (typeof limpio.mejorTasaAhorroHistorica !== "number" || isNaN(limpio.mejorTasaAhorroHistorica)) limpio.mejorTasaAhorroHistorica = 0;
+      return limpio;
     } catch (e) {
+      console.error("[gam] Error leyendo localStorage, se reinicia el estado de gamificación:", e);
       return estadoDefault();
     }
   }
@@ -158,16 +169,23 @@ const gam = (() => {
   function guardar() {
     try {
       localStorage.setItem("gamificacion", JSON.stringify(estado));
-    } catch (e) { /* storage lleno o bloqueado: fallamos en silencio */ }
+    } catch (e) {
+      // FIX: antes esto fallaba en silencio total. Ahora al menos
+      // queda un rastro en consola si el storage está lleno o bloqueado.
+      console.error("[gam] No se pudo guardar el estado de gamificación:", e);
+    }
   }
 
   /* ── NIVEL a partir de XP total ── */
   function calcularNivel(xpTotal) {
     let nivel = 1;
     let restante = xpTotal;
+    let guard = 0;
     while (restante >= xpParaNivel(nivel)) {
       restante -= xpParaNivel(nivel);
       nivel++;
+      guard++;
+      if (guard > 1000) break; // FIX: corta cualquier loop infinito improbable
     }
     return {
       nivel,
@@ -214,6 +232,13 @@ const gam = (() => {
   /* ── Recalcula stats a partir de los datos reales de la app
      y devuelve también los logros recién desbloqueados (para mostrar toast) ── */
   function recalcular({ movimientos, metas, presupuestos }) {
+    // FIX: si por algún motivo llega undefined/null en vez de arrays
+    // (por ejemplo la primera vez que carga la página), no rompemos
+    // el cálculo entero — los tratamos como vacíos.
+    movimientos  = Array.isArray(movimientos)  ? movimientos  : [];
+    metas        = Array.isArray(metas)        ? metas        : [];
+    presupuestos = (presupuestos && typeof presupuestos === "object") ? presupuestos : {};
+
     const fechasUnicas = [...new Set(
       movimientos.map(m => m.fecha).filter(Boolean)
     )];
@@ -242,15 +267,19 @@ const gam = (() => {
     estado.mejorTasaAhorroHistorica = Math.max(estado.mejorTasaAhorroHistorica, mejorTasa);
 
     // Meses donde NINGÚN presupuesto se pasó del límite (evalúa el mes actual en cada recálculo)
+    // FIX: este bloque podía contar mal si una key de presupuesto no tenía el
+    // formato "entidad_categoria" esperado (por ejemplo si la categoría
+    // contenía un "_"). Ahora se separa por el PRIMER "_" únicamente,
+    // igual que hace app.js al leer presupuestos en renderPresupuesto().
     const hoyLocal = new Date();
     const mesActual = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth()+1).padStart(2,"0")}`;
-    let mesesOk = estado.mesesPresupuestoOkRegistrados.length;
     const keys = Object.keys(presupuestos);
     if (keys.length > 0) {
       const todosOk = keys.every(key => {
-        const cat = key.split("_").slice(1).join("_");
-        const limite = presupuestos[key];
-        const entidad = key.split("_")[0];
+        const sep = key.indexOf("_");
+        const entidad = sep === -1 ? key : key.slice(0, sep);
+        const cat     = sep === -1 ? "" : key.slice(sep + 1);
+        const limite  = presupuestos[key];
         const gastado = movimientos
           .filter(m => (m.entidad||'personal') === entidad && m.tipo === "Egreso" && m.categoria === cat && m.fecha && m.fecha.startsWith(mesActual))
           .reduce((s,m) => s+m.monto, 0);
@@ -260,7 +289,7 @@ const gam = (() => {
         estado.mesesPresupuestoOkRegistrados.push(mesActual);
       }
     }
-    mesesOk = estado.mesesPresupuestoOkRegistrados.length;
+    const mesesOk = estado.mesesPresupuestoOkRegistrados.length;
 
     const stats = {
       totalMovimientos: movimientos.length,
@@ -283,6 +312,13 @@ const gam = (() => {
     });
 
     guardar();
+
+    // Log de diagnóstico: dejalo unos días y después lo podés borrar.
+    console.log("[gam] recalcular()", {
+      totalMovimientos: stats.totalMovimientos,
+      logrosDesbloqueados: estado.logrosDesbloqueados,
+      nuevosLogrosEstaVez: nuevosLogros.map(l => l.id)
+    });
 
     return { stats, nuevosLogros, nivel: calcularNivel(estado.xp) };
   }
